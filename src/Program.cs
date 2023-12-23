@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml.Serialization;
 using Antelcat.Parameterization;
 using dnlib.DotNet;
 
@@ -96,11 +97,14 @@ public static partial class Program
 
     [Command]
     private static async ValueTask Trim(
-        string[] includeDirectory,
-        string[] allowedAssembly,
-        string[] rootType,
-        string outputPath = "./output")
+        [Argument(FullName = "include-directory", ShortName = 'i')] string[] includeDirectory,
+        [Argument(FullName = "allowed-assembly", ShortName = 'a')] string[] allowedAssembly,
+        [Argument(FullName = "root-xml-path", ShortName = 'r')] string rootXmlPath,
+        [Argument(FullName = "output-path", ShortName = 'o')] string outputPath = "./output")
     {
+        if (new XmlSerializer(typeof(RootSettings)).Deserialize(File.OpenRead(rootXmlPath)) is not RootSettings root) 
+            throw new InvalidOperationException("Cannot deserialize root settings");
+        
         var typeDefs = new HashSet<TypeDef>();
         foreach (var path in includeDirectory.SelectMany(p => Directory.EnumerateFiles(p, "*.dll")))
         {
@@ -136,7 +140,22 @@ public static partial class Program
         }
 
 
-        var rootTypeDefs = typeDefs.Where(p => rootType.Contains(p.FullName)).Distinct().SelectMany(ResolveTypeDefOrRef).ToHashSet();
+        IEnumerable<TypeDef> ResolveRootTypeDefs()
+        {
+            foreach (var typeDef in typeDefs)
+            {
+                var assembly = root.Assemblies.FirstOrDefault(a => a.Name == typeDef.Module.Assembly.FullName);
+                if (assembly == null) continue;
+                var type = assembly.Types.FirstOrDefault(t => t.Name == typeDef.ReflectionFullName);
+                if (assembly.PreserveMode == RootSettings.PreserveMode.All && type is not { PreserveMode: RootSettings.PreserveMode.None })
+                {
+                    yield return typeDef;
+                }
+            }
+        }
+
+
+        var rootTypeDefs = ResolveRootTypeDefs().ToHashSet();
         Console.WriteLine("Preserving types...");
         // TODO: 保留CLR核心类型
         // foreach (var VARIABLE in typeDefs.Where(t => t.cl))
@@ -263,7 +282,7 @@ public static partial class Program
                 progressBar.Current++;
             }
 
-            rootTypeDefs = typeDefs.Where(p => rootType.Contains(p.FullName)).Distinct().SelectMany(ResolveTypeDefOrRef).ToHashSet();
+            rootTypeDefs = ResolveRootTypeDefs().ToHashSet();
         }
 
 
@@ -861,4 +880,38 @@ internal class AssemblyGraph : DependencyGraph<string, AssemblyDef>
     {
         return type.FullName;
     }
+}
+
+
+[Serializable]
+[XmlRoot("Root")]
+internal class RootSettings
+{
+    public enum PreserveMode
+    {
+        All = 1,
+        None = 2
+    }
+    
+    internal abstract class ItemBase
+    {
+        [XmlAttribute]
+        public required string Name { get; init; }
+        
+        [XmlAttribute("Preserve")]
+        public PreserveMode PreserveMode { get; init; }
+    }
+
+    internal class Type : ItemBase;
+
+    internal class Assembly : ItemBase
+    {
+        [XmlElement("Type")]
+        [XmlArray("Types")]
+        [XmlArrayItem("Type")]
+        public List<Type> Types { get; init; } = new();
+    }
+
+    [XmlElement("Assembly")]
+    public List<Assembly> Assemblies { get; init; } = new();
 }
