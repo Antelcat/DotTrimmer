@@ -8,8 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Antelcat.Parameterization" Version="1.2.2" />
-      <PackageReference Include="dnlib" Version="4.3.0" />
+      <ProjectReference Include="..\src\Antelcat.DotTrimmer.csproj" />
     </ItemGroup>
 
 </Project>
