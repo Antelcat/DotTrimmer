@@ -6,7 +6,7 @@ namespace Antelcat.DotTrimmer;
 public static class ExtensionMethods
 {
     /// <summary>
-    /// 解析一个类型的所有依赖，包括基类、接口、字段、方法、事件、自定义特性、嵌套类型等，深度为1
+    /// Resolve all dependencies of a type, including base class, interfaces, fields, methods, events, custom attributes, nested types, etc., with a depth of 1
     /// </summary>
     /// <param name="typeDef"></param>
     /// <returns></returns>
@@ -44,7 +44,7 @@ public static class ExtensionMethods
         {
             foreach (var methodDef in typeDef.Methods)
             {
-                // 自定义特性
+                // Custom attributes
                 if (methodDef.HasCustomAttributes)
                 {
                     foreach (var methodAttributeTypeDef in methodDef.CustomAttributes.SelectMany(ResolveCustomAttribute))
@@ -53,13 +53,13 @@ public static class ExtensionMethods
                     }
                 }
 
-                // 参数类型
+                // Parameter types
                 foreach (var parameterTypeDef in methodDef.Parameters.SelectMany(p => ResolveTypeSig(p.Type)))
                 {
                     yield return parameterTypeDef;
                 }
 
-                // 泛型参数自定义特性
+                // Generic parameter custom attributes
                 if (methodDef.HasGenericParameters)
                 {
                     foreach (var genericParamAttributeTypeDef in methodDef.GenericParameters
@@ -70,7 +70,7 @@ public static class ExtensionMethods
                     }
                 }
 
-                // 参数自定义特性和返回值自定义特性
+                // Parameter custom attributes and return value custom attributes
                 if (methodDef.HasParamDefs)
                 {
                     foreach (var paramDef in methodDef.ParamDefs)
@@ -82,13 +82,13 @@ public static class ExtensionMethods
                     }
                 }
 
-                // 返回值类型
+                // Return value type
                 foreach (var returnTypeDef in ResolveTypeSig(methodDef.ReturnType))
                 {
                     yield return returnTypeDef;
                 }
 
-                // 方法内部引用
+                // Method body references
                 if (!methodDef.HasBody) continue;
 
                 if (methodDef.Body.HasVariables)
@@ -134,7 +134,7 @@ public static class ExtensionMethods
                                 yield return methodSpecTypeDef;
                             }
 
-                            // 这里只处理这个方法调用时的泛型参数，其他的不用处理，因为此时已经引用了方法的所有类，接下来会处理
+                            // Only process generic arguments of this method call, others are not processed because all classes referenced by the method have been referenced and will be processed next
                             foreach (var methodSpecGenericTypeDef in methodSpec.GenericInstMethodSig.GenericArguments
                                          .SelectMany(t => ResolveTypeDefOrRef(t.ToTypeDefOrRef())))
                             {
@@ -208,7 +208,7 @@ public static class ExtensionMethods
     }
 
     /// <summary>
-    /// 提取自定义特性，这包括它自己本身的TypeDef、Enum、以及可能的typeof(T)中的T的TypeDef
+    /// Extract custom attributes, including its own TypeDef, Enum, and possible TypeDef of T in typeof(T)
     /// </summary>
     /// <param name="customAttribute"></param>
     /// <returns></returns>
@@ -257,7 +257,7 @@ public static class ExtensionMethods
     }
 
     /// <summary>
-    /// 提取所有的泛型（如果有）以及泛型参数的类型（递归），同样也会提取泛型参数的自定义特性
+    /// Extract all generics (if any) and types of generic parameters (recursive), also extract custom attributes of generic parameters
     /// </summary>
     /// <param name="typeDefOrRef"></param>
     /// <returns></returns>
@@ -283,27 +283,27 @@ public static class ExtensionMethods
                     yield return typeDef;
                     break;
                 }
-                case TypeSpec typeSpec: // 泛型实例
+                case TypeSpec typeSpec: // Generic instance
                 {
                     if (typeSpec.TryGetGenericInstSig() is { } genericInst)
                     {
-                        // 返回泛型实例的基类型
+                        // Return base type of generic instance
                         foreach (var typeDef in ResolveTypeDefOrRef(genericInst.GenericType.TypeDefOrRef))
                         {
                             yield return typeDef;
                         }
 
-                        // 遍历并返回所有泛型参数的类型
+                        // Traverse and return all types of generic parameters
                         foreach (var argTypeSig in genericInst.GenericArguments)
                         {
                             if (argTypeSig.ToTypeDefOrRef() is not { } argType) continue;
 
-                            // 泛型参数的类型
+                            // Type of generic parameter
                             foreach (var typeDef in ResolveTypeDefOrRef(argType))
                             {
                                 yield return typeDef;
                             }
-                            // 泛型参数的自定义特性
+                            // Custom attributes of generic parameter
                             foreach (var argAttributeTypeDef in argType.CustomAttributes.SelectMany(ResolveCustomAttribute))
                             {
                                 yield return argAttributeTypeDef;
@@ -411,7 +411,7 @@ public static class ExtensionMethods
     }
 
     /// <summary>
-    /// 返回所有非null值
+    /// Return all non-null values
     /// </summary>
     /// <param name="source"></param>
     /// <typeparam name="T"></typeparam>

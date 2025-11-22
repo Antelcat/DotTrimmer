@@ -3,9 +3,9 @@
 namespace Antelcat.DotTrimmer.Models;
 
 /// <summary>
-/// 记录程序集依赖关系的图
+/// Graph recording assembly dependencies
 /// </summary>
-internal class AssemblyGraph : DependencyGraph<string, AssemblyDef>
+public class AssemblyGraph : DependencyGraph<string, AssemblyDef>
 {
     protected override string GetKey(AssemblyDef type)
     {

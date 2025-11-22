@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace Antelcat.DotTrimmer.Models;
 
 /// <summary>
-/// 表示记录依赖关系的图，子类需要实现 <see cref="GetKey"/> 方法以提供节点的键
+/// Represents a graph recording dependencies, subclasses need to implement <see cref="GetKey"/> method to provide keys for nodes
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TType"></typeparam>

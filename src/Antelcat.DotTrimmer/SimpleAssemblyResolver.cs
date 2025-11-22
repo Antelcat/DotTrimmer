@@ -2,7 +2,7 @@
 
 namespace Antelcat.DotTrimmer;
 
-internal class SimpleAssemblyResolver : IAssemblyResolver
+public class SimpleAssemblyResolver : IAssemblyResolver
 {
     public IEnumerable<AssemblyDef> AssemblyDefs => assemblyCache.Values;
 
@@ -74,7 +74,7 @@ internal class SimpleAssemblyResolver : IAssemblyResolver
         return pathMap.FirstOrDefault(p => p.Value == assembly.Name).Key;
     }
 
-    private static string NormalizePath(string path)
+    public static string NormalizePath(string path)
     {
         return Environment.ExpandEnvironmentVariables(Path.GetFullPath(path)).TrimEnd('\\', '/');
     }

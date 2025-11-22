@@ -3,9 +3,9 @@
 namespace Antelcat.DotTrimmer.Models;
 
 /// <summary>
-/// 记录类型依赖关系的图
+/// Graph recording type dependencies
 /// </summary>
-internal class TypeGraph : DependencyGraph<TypeDef, TypeDef>
+public class TypeGraph : DependencyGraph<TypeDef, TypeDef>
 {
     protected override TypeDef GetKey(TypeDef type)
     {

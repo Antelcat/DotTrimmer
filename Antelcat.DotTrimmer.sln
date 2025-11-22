@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antelcat.DotTrimmer", "src\Antelcat.DotTrimmer.csproj", "{72BA028F-EEDD-4CCF-9194-47C1EF57F54F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antelcat.DotTrimmer", "src\Antelcat.DotTrimmer\Antelcat.DotTrimmer.csproj", "{72BA028F-EEDD-4CCF-9194-47C1EF57F54F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antelcat.DotTrimmer.Console", "Antelcat.DotTrimmer.Console\Antelcat.DotTrimmer.Console.csproj", "{D2B757EA-496F-401F-9041-54E01CD03115}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antelcat.DotTrimmer.Console", "src\Antelcat.DotTrimmer.Console\Antelcat.DotTrimmer.Console.csproj", "{D2B757EA-496F-401F-9041-54E01CD03115}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

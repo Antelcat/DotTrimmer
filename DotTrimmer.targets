@@ -1,0 +1,60 @@
+<Project>
+  <!-- Default properties -->
+  <PropertyGroup>
+    <!-- Enable trimming switch, default is true, can be disabled via /p:EnableDotTrimmer=false -->
+    <EnableDotTrimmer Condition="'$(EnableDotTrimmer)' == ''">true</EnableDotTrimmer>
+    
+    <!-- Path to the DotTrimmer console project. Assuming it's added as a submodule or in the solution -->
+    <!-- Adjust this path relative to your project file -->
+    <DotTrimmerProjectPath Condition="'$(DotTrimmerProjectPath)' == ''">$(MSBuildThisFileDirectory)src\Antelcat.DotTrimmer.Console\Antelcat.DotTrimmer.Console.csproj</DotTrimmerProjectPath>
+    
+    <!-- Path to the trimming configuration file, default is DotTrimmer.xml in the project root -->
+    <DotTrimmerConfigPath Condition="'$(DotTrimmerConfigPath)' == ''">$(MSBuildProjectDirectory)\DotTrimmer.xml</DotTrimmerConfigPath>
+    
+    <!-- Trimming mode: Include (only trim specified) or Exclude (trim all except specified) -->
+    <DotTrimmerMode Condition="'$(DotTrimmerMode)' == ''">Exclude</DotTrimmerMode>
+  </PropertyGroup>
+
+  <!-- Define assemblies to exclude (when Mode=Exclude) -->
+  <ItemGroup Condition="'$(DotTrimmerMode)' == 'Exclude'">
+    <!-- Default exclude self -->
+    <DotTrimmerExcludeAssembly Include="$(AssemblyName).dll" />
+    <!-- Add more default exclusions here -->
+  </ItemGroup>
+
+  <!-- Define assemblies to include (when Mode=Include) -->
+  <ItemGroup Condition="'$(DotTrimmerMode)' == 'Include'">
+    <!-- Add default inclusions here -->
+  </ItemGroup>
+
+  <!-- 
+    Execute trimming after the Publish target 
+    AfterTargets="Publish" ensures it runs after publication is complete
+  -->
+  <Target Name="RunDotTrimmer" AfterTargets="Publish" Condition="'$(EnableDotTrimmer)' == 'true' And Exists('$(DotTrimmerConfigPath)')">
+    <Message Text="[DotTrimmer] Starting trimming process..." Importance="high" />
+    <Message Text="[DotTrimmer] Target Directory: $(PublishDir)" Importance="high" />
+    
+    <!-- Build arguments -->
+    <PropertyGroup>
+      <_DotTrimmerArgs>trim -i "$(PublishDir)" -r "$(DotTrimmerConfigPath)" -m $(DotTrimmerMode)</_DotTrimmerArgs>
+      
+      <!-- Handle exclude list -->
+      <_DotTrimmerArgs Condition="'$(DotTrimmerMode)' == 'Exclude' And @(DotTrimmerExcludeAssembly) != ''">
+        $(_DotTrimmerArgs) -a @(DotTrimmerExcludeAssembly->'"%(Identity)"', ' -a ')
+      </_DotTrimmerArgs>
+
+      <!-- Handle include list -->
+      <_DotTrimmerArgs Condition="'$(DotTrimmerMode)' == 'Include' And @(DotTrimmerIncludeAssembly) != ''">
+        $(_DotTrimmerArgs) -a @(DotTrimmerIncludeAssembly->'"%(Identity)"', ' -a ')
+      </_DotTrimmerArgs>
+    </PropertyGroup>
+
+    <!-- Run the tool using dotnet run -->
+    <!-- This compiles and runs the tool from source -->
+    <Exec Command="dotnet run --project &quot;$(DotTrimmerProjectPath)&quot; -- $(_DotTrimmerArgs)" 
+          ConsoleToMSBuild="true" />
+          
+    <Message Text="[DotTrimmer] Trimming completed successfully." Importance="high" />
+  </Target>
+</Project>

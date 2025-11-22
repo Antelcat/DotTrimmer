@@ -1,5 +1,8 @@
 ﻿namespace Antelcat.DotTrimmer;
 
+/// <summary>
+/// A simple progress bar for console application.
+/// </summary>
 public class ProgressBar : IDisposable
 {
     public int Current
@@ -24,6 +27,9 @@ public class ProgressBar : IDisposable
         Task.Factory.StartNew(UpdateTask, cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
     }
 
+    /// <summary>
+    /// Updates the progress bar animation.
+    /// </summary>
     private async ValueTask UpdateTask(object? arg)
     {
         var cancellationToken = (CancellationToken)arg!;

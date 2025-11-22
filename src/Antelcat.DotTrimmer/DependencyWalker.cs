@@ -9,7 +9,7 @@ public class DependencyWalker
     private readonly static ModuleContext ModuleContext = new(AssemblyResolver);
 
     /// <summary>
-    /// 给定一个程序集列表，通过RootSettings，找出其中未被引用的程序集
+    /// Given a list of assemblies, find the unused assemblies based on RootSettings
     /// </summary>
     /// <param name="assemblyPaths"></param>
     /// <param name="rootSettings"></param>
