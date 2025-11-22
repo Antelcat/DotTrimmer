@@ -30,8 +30,8 @@ public static partial class Program
         [Argument(FullName = "root-xml-path", ShortName = 'r')] string rootXmlPath,
         [Argument(FullName = "output-path", ShortName = 'o')] string? outputPath = null,
         [Argument(FullName = "trim-mode", ShortName = 'm')] TrimMode trimMode = TrimMode.Include,
-        [Argument(FullName = "assembly", ShortName = 'a')] string[]? assemblies = null,
-        [Argument(FullName = "extra-directory", ShortName = 'e')] string[]? extraDirectories = null)
+        [Argument(FullName = "assembly", ShortName = 'a', Converter = typeof(StringToArrayTypeConverter))] string[]? assemblies = null,
+        [Argument(FullName = "extra-directory", ShortName = 'e', Converter = typeof(StringToArrayTypeConverter))] string[]? extraDirectories = null)
     {
         var config = new TrimmerConfiguration
         {
@@ -116,5 +116,22 @@ public static partial class Program
         }
         
         await ValueTask.CompletedTask;
+    }
+}
+
+internal class StringToArrayTypeConverter : System.ComponentModel.StringConverter
+{
+    public override bool GetStandardValuesSupported(System.ComponentModel.ITypeDescriptorContext? context) => false;
+
+    public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Type sourceType)
+    {
+        if (sourceType == typeof(string))
+            return true;
+        return base.CanConvertFrom(context, sourceType);
+    }
+
+    public override object? ConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
+    {
+        return value?.ToString();
     }
 }

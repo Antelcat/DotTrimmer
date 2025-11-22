@@ -1,12 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Antelcat.Parameterization" Version="1.2.2" />
-    <PackageReference Include="dnlib" Version="4.3.0" />
+    <PackageReference Include="Antelcat.Parameterization"/>
+    <PackageReference Include="dnlib"/>
   </ItemGroup>
 </Project>

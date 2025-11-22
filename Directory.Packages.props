@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Antelcat.Parameterization" Version="1.2.5"/>
+    <PackageVersion Include="dnlib" Version="4.5.0"/>
+  </ItemGroup>
+</Project>

@@ -26,8 +26,6 @@ public class RootSettings
     public class Assembly : ItemBase
     {
         [XmlElement("Type")]
-        [XmlArray("Types")]
-        [XmlArrayItem("Type")]
         public List<Type> Types { get; init; } = new();
     }
 
